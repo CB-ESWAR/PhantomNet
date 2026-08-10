@@ -1,20 +1,22 @@
-from fastapi import FastAPI
+from pathlib import Path
 
-from middleware import register
-from routes import router
+API_DIR = Path(__file__).resolve().parent
+BACKEND_DIR = API_DIR.parent
+PROJECT_ROOT = BACKEND_DIR.parent
 
-app = FastAPI(
-    title="PhantomNet API",
-    version="1.0.0"
+ENGINE_PATH = (
+    BACKEND_DIR
+    / "build"
+    / "engine"
+    / "phantomnet.exe"
 )
 
-register(app)
+UPLOAD_FOLDER = (
+    BACKEND_DIR
+    / "uploads"
+)
 
-app.include_router(router)
-
-
-@app.get("/")
-def home():
-    return {
-        "message": "PhantomNet API Running"
-    }
+UPLOAD_FOLDER.mkdir(
+    parents=True,
+    exist_ok=True
+)

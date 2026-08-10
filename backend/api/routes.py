@@ -8,7 +8,6 @@ from config import ENGINE_PATH
 from dependencies import validate_text
 from schemas import AnalyzeRequest, AnalyzeResponse
 
-
 router = APIRouter()
 
 
@@ -24,26 +23,44 @@ def extract_text_from_file(file_bytes: bytes, filename: str) -> str:
     elif filename_lower.endswith(".pdf"):
         try:
             import pypdf
+
             pdf_file = io.BytesIO(file_bytes)
             reader = pypdf.PdfReader(pdf_file)
+
             text_parts = []
+
             for page in reader.pages:
                 extracted = page.extract_text()
+
                 if extracted:
                     text_parts.append(extracted)
+
             return "\n".join(text_parts)
+
         except Exception as error:
-            raise ValueError(f"Failed to extract PDF content: {str(error)}")
+            raise ValueError(
+                f"Failed to extract PDF content: {str(error)}"
+            )
 
     elif filename_lower.endswith(".docx"):
         try:
             import docx
+
             docx_file = io.BytesIO(file_bytes)
             doc = docx.Document(docx_file)
-            text_parts = [p.text for p in doc.paragraphs if p.text]
+
+            text_parts = [
+                paragraph.text
+                for paragraph in doc.paragraphs
+                if paragraph.text
+            ]
+
             return "\n".join(text_parts)
+
         except Exception as error:
-            raise ValueError(f"Failed to extract DOCX content: {str(error)}")
+            raise ValueError(
+                f"Failed to extract DOCX content: {str(error)}"
+            )
 
     else:
         raise HTTPException(
@@ -56,7 +73,7 @@ def run_engine_analysis(text: str) -> dict:
     if not ENGINE_PATH.exists():
         raise HTTPException(
             status_code=500,
-            detail="PhantomNet engine executable was not found."
+            detail=f"PhantomNet engine executable was not found at: {ENGINE_PATH}"
         )
 
     try:
@@ -70,14 +87,17 @@ def run_engine_analysis(text: str) -> dict:
 
         if result.returncode != 0:
             error = result.stderr.strip()
+
             if not error:
                 error = "PhantomNet engine failed."
+
             raise HTTPException(
                 status_code=500,
                 detail=error
             )
 
         output = result.stdout.strip()
+
         if not output:
             raise HTTPException(
                 status_code=500,
@@ -86,6 +106,7 @@ def run_engine_analysis(text: str) -> dict:
 
         try:
             return json.loads(output)
+
         except json.JSONDecodeError:
             raise HTTPException(
                 status_code=500,
@@ -96,6 +117,15 @@ def run_engine_analysis(text: str) -> dict:
         raise HTTPException(
             status_code=504,
             detail="PhantomNet analysis timed out."
+        )
+
+    except HTTPException:
+        raise
+
+    except Exception as error:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Engine execution failed: {str(error)}"
         )
 
 
@@ -109,6 +139,7 @@ def analyze(
     try:
         try:
             text = validate_text(request.text)
+
         except ValueError as error:
             raise HTTPException(
                 status_code=400,
@@ -119,6 +150,7 @@ def analyze(
 
     except HTTPException:
         raise
+
     except Exception as error:
         raise HTTPException(
             status_code=500,
@@ -143,14 +175,20 @@ def analyze_file(
         file_bytes = file.file.read()
 
         try:
-            raw_text = extract_text_from_file(file_bytes, file.filename)
+            raw_text = extract_text_from_file(
+                file_bytes,
+                file.filename
+            )
+
         except HTTPException:
             raise
+
         except ValueError as error:
             raise HTTPException(
                 status_code=400,
                 detail=str(error)
             )
+
         except Exception:
             raise HTTPException(
                 status_code=400,
@@ -159,18 +197,20 @@ def analyze_file(
 
         try:
             text = validate_text(raw_text)
-        except ValueError:
+
+        except ValueError as error:
             raise HTTPException(
                 status_code=400,
-                detail="Could not extract text from file."
+                detail=str(error)
             )
 
         return run_engine_analysis(text)
 
     except HTTPException:
         raise
+
     except Exception as error:
         raise HTTPException(
             status_code=500,
             detail=str(error)
-        )
+        )
