@@ -382,19 +382,44 @@ const handleExecuteFileAnalysis = async (file: File) => {
 
       <footer className="footer-container">
 
-        <div className="footer-inner font-mono">
+  <div className="footer-inner font-mono">
 
-          <span>
-            PHANTOMNET v1.0.0 — FORENSIC LINGUISTIC INTELLIGENCE ENGINE
-          </span>
+    <span>
+      PHANTOMNET v1.0.0 — FORENSIC LINGUISTIC INTELLIGENCE ENGINE
+    </span>
 
-          <span>
-            C++ ENGINE CORE • FASTAPI INTEGRATION
-          </span>
+    <span>
+      C++ ENGINE CORE • FASTAPI INTEGRATION
+    </span>
 
-        </div>
+    <span className="footer-social">
+      Built with <span className="heart">♥</span> by Eswar
+      <a
+        href="https://www.linkedin.com/in/eswar-chandra-reddy-82a5062b6"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        LinkedIn
+      </a>
+      <a
+        href="https://www.instagram.com/c_b_eswar_07/?hl=en"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Instagram
+      </a>
+      <a
+        href="https://github.com/CB-ESWAR"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        GitHub
+      </a>
+    </span>
 
-      </footer>
+  </div>
+
+</footer>
 
       <style>{`
         .app-container {
@@ -471,6 +496,28 @@ const handleExecuteFileAnalysis = async (file: File) => {
           color: var(--text-muted);
           letter-spacing: 0.1em;
         }
+          .footer-social {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+}
+
+.footer-social a {
+  color: #00eaff;
+  text-decoration: none;
+  transition: 0.2s;
+}
+
+.footer-social a:hover {
+  color: #ffffff;
+  text-shadow: 0 0 8px rgba(0, 234, 255, 0.5);
+}
+
+.heart {
+  color: #ff4d6d;
+  font-size: 12px;
+}
 
         @media (max-width: 640px) {
 
