@@ -4,9 +4,9 @@ import subprocess
 
 from fastapi import APIRouter, HTTPException, UploadFile, File
 
-from config import ENGINE_PATH
-from dependencies import validate_text
-from schemas import AnalyzeRequest, AnalyzeResponse
+from api.config import ENGINE_PATH
+from api.dependencies import validate_text
+from api.schemas import AnalyzeRequest, AnalyzeResponse
 
 router = APIRouter()
 
